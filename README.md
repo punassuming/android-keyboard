@@ -6,6 +6,20 @@ Check out the [FUTO Keyboard website](https://keyboard.futo.org/) for downloads 
 
 The code is licensed under the [FUTO Source First License 1.1](LICENSE.md).
 
+## Why this project exists
+
+FUTO Keyboard is focused on private, offline-first typing on Android while still being practical for daily use. The project continues to evolve from the AOSP LatinIME base with feature work, layout improvements, and language support updates.
+
+## Project documentation
+
+The `doc/` directory contains focused guides for contributors and maintainers:
+
+- [Project purpose](doc/purpose.md)
+- [Getting started](doc/getting-started.md)
+- [Usage and development workflows](doc/usage.md)
+- [Collaboration workflow](doc/collaboration.md)
+- [Contributing guide](doc/contributing.md)
+
 ## Issue tracking and contributing
 
 Please check the GitHub repository to report issues: [https://github.com/futo-org/android-keyboard/](https://github.com/futo-org/android-keyboard/)
@@ -23,17 +37,20 @@ If you want to contribute layouts, check out the [layouts repo](https://github.c
 ## Building
 
 When cloning the repository, you must perform a recursive clone to fetch all dependencies:
-```
+
+```bash
 git clone --recursive https://gitlab.futo.org/keyboard/latinime.git
 ```
 
 If you forgot to specify recursive clone, use this to fetch submodules:
-```
+
+```bash
 git submodule update --init --recursive
 ```
 
 You can then open the project in Android Studio and build it that way, or use gradle commands:
-```
+
+```bash
 ./gradlew assembleUnstableDebug
 ./gradlew assembleStableRelease
 ```
