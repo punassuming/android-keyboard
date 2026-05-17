@@ -422,6 +422,7 @@ object SettingsExporter {
 
                     val subdirName = names[1]
                     val fileName = names[2]
+                    // Exported user dictionary backups are expected under UserHistoryDictionary* dirs.
                     if (
                         !subdirName.startsWith("UserHistoryDictionary")
                         || subdirName.contains("..")
@@ -431,7 +432,6 @@ object SettingsExporter {
                     }
 
                     val subdir = resolveZipTarget(context.filesDir, subdirName)
-                    subdir.mkdirs()
 
                     val targetFile = resolveZipTarget(subdir, fileName)
                     targetFile.outputStream().use {
