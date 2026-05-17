@@ -319,13 +319,14 @@ object SettingsExporter {
             baseDir.mkdirs()
         }
 
-        val target = File(baseDir, normalized)
         val basePath = baseDir.canonicalFile.toPath()
-        val targetPath = target.canonicalFile.toPath()
-        if (targetPath != basePath && !targetPath.startsWith(basePath)) {
+        val targetPath = basePath.resolve(normalized).normalize()
+        if (!targetPath.startsWith(basePath)) {
             throw IllegalArgumentException("Path traversal attempt in backup: $relativePath")
         }
 
+        val target = targetPath.toFile()
+        target.parentFile?.mkdirs()
         return target
     }
 
@@ -401,7 +402,6 @@ object SettingsExporter {
 
                 entry.name.startsWith("ext/") -> {
                     val targetFile = resolveZipTarget(extFilesDir, entry.name.splitSlash())
-                    targetFile.parentFile?.mkdirs()
                     targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
@@ -409,7 +409,6 @@ object SettingsExporter {
 
                 entry.name.startsWith("transformers/") -> {
                     val targetFile = resolveZipTarget(transformersDir, entry.name.splitSlash())
-                    targetFile.parentFile?.mkdirs()
                     targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
@@ -435,7 +434,6 @@ object SettingsExporter {
                     subdir.mkdirs()
 
                     val targetFile = resolveZipTarget(subdir, fileName)
-                    targetFile.parentFile?.mkdirs()
                     targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
@@ -476,7 +474,6 @@ object SettingsExporter {
                     val rimeDir = ChineseIME.getRimeDir(context)
 
                     val targetFile = resolveZipTarget(rimeDir, relDir)
-                    targetFile.parentFile!!.mkdirs()
 
                     targetFile.outputStream().use {
                         zipIn.copyTo(it)
@@ -487,7 +484,6 @@ object SettingsExporter {
                     themesDir.mkdirs()
 
                     val targetFile = resolveZipTarget(themesDir, entry.name.splitSlash())
-                    targetFile.parentFile?.mkdirs()
                     targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
