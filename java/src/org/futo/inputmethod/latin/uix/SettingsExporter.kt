@@ -309,6 +309,24 @@ object SettingsExporter {
 
     private fun String.splitSlash(): String = split("/", limit = 2)[1]
 
+    private fun resolveZipTarget(baseDir: File, relativePath: String): File {
+        val normalized = relativePath.replace('\\', '/')
+        if (normalized.isBlank() || normalized.startsWith("/")) {
+            throw IllegalArgumentException("Invalid path in backup: $relativePath")
+        }
+
+        val target = File(baseDir, normalized)
+        val baseCanonical = baseDir.canonicalFile
+        val targetCanonical = target.canonicalFile
+        val basePath = baseCanonical.path
+        val targetPath = targetCanonical.path
+        if (targetPath != basePath && !targetPath.startsWith("$basePath${File.separator}")) {
+            throw IllegalArgumentException("Path traversal attempt in backup: $relativePath")
+        }
+
+        return target
+    }
+
     suspend fun loadSettings(
         context: Context,
         inputStream: InputStream,
@@ -380,39 +398,53 @@ object SettingsExporter {
                 }
 
                 entry.name.startsWith("ext/") -> {
-                    File(extFilesDir, entry.name.splitSlash()).outputStream().use {
+                    val targetFile = resolveZipTarget(extFilesDir, entry.name.splitSlash())
+                    targetFile.parentFile?.mkdirs()
+                    targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
                 }
 
                 entry.name.startsWith("transformers/") -> {
-                    File(transformersDir, entry.name.splitSlash()).outputStream().use {
+                    val targetFile = resolveZipTarget(transformersDir, entry.name.splitSlash())
+                    targetFile.parentFile?.mkdirs()
+                    targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
                 }
 
                 entry.name.startsWith("userdict/") -> {
                     val names = entry.name.split("/")
-                    assert(names.size == 3)
+                    if (names.size != 3 || names[1].isBlank() || names[2].isBlank()) {
+                        throw IllegalArgumentException("Invalid user dictionary path in backup: ${entry.name}")
+                    }
 
                     val subdirName = names[1]
                     val fileName = names[2]
+                    if (!subdirName.startsWith("UserHistoryDictionary")) {
+                        throw IllegalArgumentException("Invalid user dictionary directory in backup: $subdirName")
+                    }
 
-                    val subdir = File(context.filesDir, subdirName)
+                    val subdir = resolveZipTarget(context.filesDir, subdirName)
                     subdir.mkdirs()
 
-                    File(subdir, fileName).outputStream().use {
+                    val targetFile = resolveZipTarget(subdir, fileName)
+                    targetFile.parentFile?.mkdirs()
+                    targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
                 }
 
                 entry.name.startsWith("clipboard/") -> {
                     val relDir = entry.name.splitSlash()
-                    assert(!relDir.contains('/'))
+                    if (relDir.contains('/')) {
+                        throw IllegalArgumentException("Invalid clipboard path in backup: ${entry.name}")
+                    }
 
                     val clipboardDir = context.clipboardDir
                     clipboardDir.mkdirs()
-                    File(clipboardDir, relDir).outputStream().use {
+                    val targetFile = resolveZipTarget(clipboardDir, relDir)
+                    targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
                 }
@@ -421,11 +453,14 @@ object SettingsExporter {
                 entry.name.startsWith("mozc/") -> {
                     val relDir = entry.name.splitSlash()
 
-                    assert(!relDir.contains('/'))
+                    if (relDir.contains('/')) {
+                        throw IllegalArgumentException("Invalid mozc path in backup: ${entry.name}")
+                    }
 
                     val userProfileDir = mozcUserProfileDir(context)
                     userProfileDir.mkdirs()
-                    File(userProfileDir, relDir).outputStream().use {
+                    val targetFile = resolveZipTarget(userProfileDir, relDir)
+                    targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
                 }
@@ -434,7 +469,7 @@ object SettingsExporter {
                     val relDir = entry.name.splitSlash()
                     val rimeDir = ChineseIME.getRimeDir(context)
 
-                    val targetFile = File(rimeDir, relDir)
+                    val targetFile = resolveZipTarget(rimeDir, relDir)
                     targetFile.parentFile!!.mkdirs()
 
                     targetFile.outputStream().use {
@@ -445,7 +480,9 @@ object SettingsExporter {
                 entry.name.startsWith("themes/") -> {
                     themesDir.mkdirs()
 
-                    File(themesDir, entry.name.splitSlash()).outputStream().use {
+                    val targetFile = resolveZipTarget(themesDir, entry.name.splitSlash())
+                    targetFile.parentFile?.mkdirs()
+                    targetFile.outputStream().use {
                         zipIn.copyTo(it)
                     }
                 }
