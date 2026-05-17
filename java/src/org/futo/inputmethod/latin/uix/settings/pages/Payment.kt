@@ -89,6 +89,7 @@ import kotlin.math.absoluteValue
 
 val IS_ALREADY_PAID = SettingsKey(booleanPreferencesKey("already_paid"), false)
 val IS_PAYMENT_PENDING = SettingsKey(booleanPreferencesKey("payment_pending"), false)
+val PAYMENT_PENDING_STARTED_AT = SettingsKey(longPreferencesKey("payment_pending_started_at"), 0L)
 val HAS_SEEN_PAID_NOTICE = SettingsKey(booleanPreferencesKey("seen_paid_notice"), false)
 val FORCE_SHOW_NOTICE = SettingsKey(booleanPreferencesKey("force_show_notice"), false)
 val NOTICE_REMINDER_TIME = SettingsKey(longPreferencesKey("notice_reminder_time"), 0L)
@@ -479,7 +480,11 @@ fun PaymentScreen(
 
                 if(BuildConfig.IS_PLAYSTORE_BUILD) {
                     Button(
-                        onClick = { context.openURI(BuildConfig.GOOGLEPAY_URL) },
+                        onClick = {
+                            context.setSettingBlocking(IS_PAYMENT_PENDING.key, true)
+                            context.setSettingBlocking(PAYMENT_PENDING_STARTED_AT.key, System.currentTimeMillis())
+                            context.openURI(BuildConfig.GOOGLEPAY_URL)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 44.dp)
@@ -509,7 +514,11 @@ fun PaymentScreen(
                     }*/
                 } else {
                     Button(
-                        onClick = { context.openURI(BuildConfig.FUTOPAY_URL) },
+                        onClick = {
+                            context.setSettingBlocking(IS_PAYMENT_PENDING.key, true)
+                            context.setSettingBlocking(PAYMENT_PENDING_STARTED_AT.key, System.currentTimeMillis())
+                            context.openURI(BuildConfig.FUTOPAY_URL)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 44.dp)

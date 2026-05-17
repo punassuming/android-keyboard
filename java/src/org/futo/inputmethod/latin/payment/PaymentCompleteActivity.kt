@@ -29,12 +29,18 @@ import org.futo.inputmethod.latin.uix.settings.SettingsActivity
 import org.futo.inputmethod.latin.uix.settings.pages.EXT_LICENSE_KEY
 import org.futo.inputmethod.latin.uix.settings.pages.IS_ALREADY_PAID
 import org.futo.inputmethod.latin.uix.settings.pages.IS_PAYMENT_PENDING
+import org.futo.inputmethod.latin.uix.settings.pages.PAYMENT_PENDING_STARTED_AT
 import org.futo.inputmethod.latin.uix.settings.pages.PaymentThankYouScreen
 import org.futo.inputmethod.latin.uix.settings.pages.startAppActivity
 import org.futo.inputmethod.latin.uix.theme.UixThemeAuto
 import org.futo.inputmethod.updates.openURI
 
 class PaymentCompleteActivity : ComponentActivity() {
+    private fun isExpectedActivationUri(targetData: String): Boolean {
+        return targetData == "futo-keyboard://license/activate"
+                || targetData == "futo-voice-input://license/activate"
+    }
+
     private fun updateContent() {
         setContent {
             DataStoreCacheProvider {
@@ -60,6 +66,7 @@ class PaymentCompleteActivity : ComponentActivity() {
             dataStore.edit {
                 it[IS_ALREADY_PAID.key] = true
                 it[IS_PAYMENT_PENDING.key] = false
+                it[PAYMENT_PENDING_STARTED_AT.key] = 0L
                 it[EXT_LICENSE_KEY.key] = license
             }
 
@@ -106,10 +113,19 @@ class PaymentCompleteActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val targetData = intent.dataString
-        if((targetData?.startsWith("futo-keyboard://license/") == true) || (targetData?.startsWith("futo-voice-input://license/") == true)) {
+        val pendingStartedAt = applicationContext.getSetting(PAYMENT_PENDING_STARTED_AT)
+        val isRecentPending = (System.currentTimeMillis() - pendingStartedAt) <= (1000L * 60L * 60L * 24L)
+        val isPending = applicationContext.getSetting(IS_PAYMENT_PENDING)
+
+        if(targetData != null && isExpectedActivationUri(targetData) && isPending && isRecentPending) {
             onPaid("activate")
         } else {
             Log.e("PaymentCompleteActivity", "futo-keyboard launched with invalid targetData $targetData")
+            lifecycleScope.launch {
+                dataStore.edit {
+                    it[IS_PAYMENT_PENDING.key] = false
+                }
+            }
             finish()
         }
     }

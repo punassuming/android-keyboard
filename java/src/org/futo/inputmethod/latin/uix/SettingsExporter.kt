@@ -186,6 +186,26 @@ object SettingsExporter {
     private const val sharedPreferencesFileName = "sharedPreferences.json"
     private const val clipboardFileName = ClipboardFileName
     private const val personalDictFileName = "userdictionary.json"
+    private const val maxBackupEntryBytes = 128 * 1024 * 1024
+    private const val maxBackupTotalBytes = 512L * 1024L * 1024L
+
+    private fun readEntryBytesLimited(input: InputStream, maxBytes: Int): ByteArray {
+        return input.readAllBytesCompat(maxBytes)
+    }
+
+    private fun copyEntryToLimited(input: InputStream, output: OutputStream, maxBytes: Int): Long {
+        val buffer = ByteArray(8192)
+        var total = 0L
+        var read: Int
+        while (input.read(buffer).also { read = it } != -1) {
+            total += read
+            if (total > maxBytes) {
+                throw IllegalArgumentException("Backup entry exceeds size limit")
+            }
+            output.write(buffer, 0, read)
+        }
+        return total
+    }
 
     suspend fun exportSettings(
         context: Context,
@@ -336,6 +356,7 @@ object SettingsExporter {
         destructive: Boolean
     ) = ZipInputStream(inputStream).use { zipIn ->
         var entry = zipIn.nextEntry
+        var totalBytesExtracted = 0L
 
         val clipboardFile = context.clipboardFile
         val transformersDir = ModelPaths.getModelDirectory(context)
@@ -376,25 +397,42 @@ object SettingsExporter {
                 entry.name == versionFileName -> {}
 
                 entry.name == datastoreFileName -> {
-                    val prefsData = zipIn.readAllBytesCompat()
+                    val prefsData = readEntryBytesLimited(zipIn, maxBackupEntryBytes)
+                    totalBytesExtracted += prefsData.size.toLong()
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
+                    }
                     val prefs = PreferencesSerializer.readFrom(prefsData.inputStream().source().buffer())
                     context.dataStore.updateData { prefs }
                 }
 
                 entry.name == sharedPreferencesFileName -> {
+                    val data = readEntryBytesLimited(zipIn, maxBackupEntryBytes)
+                    totalBytesExtracted += data.size.toLong()
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
+                    }
                     val editor = getDefaultSharedPreferences(context).edit()
-                    readSharedPrefs(editor, zipIn)
+                    readSharedPrefs(editor, data.inputStream())
                     @SuppressLint("ApplySharedPref")
                     editor.commit()
                 }
 
                 entry.name == personalDictFileName -> {
-                    readPersonalDict(context, zipIn, destructive)
+                    val data = readEntryBytesLimited(zipIn, maxBackupEntryBytes)
+                    totalBytesExtracted += data.size.toLong()
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
+                    }
+                    readPersonalDict(context, data.inputStream(), destructive)
                 }
 
                 entry.name == clipboardFileName -> {
                     clipboardFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
 
                     onClipboardImportedFlow.emit(clipboardFile)
@@ -403,14 +441,20 @@ object SettingsExporter {
                 entry.name.startsWith("ext/") -> {
                     val targetFile = resolveZipTarget(extFilesDir, entry.name.splitSlash())
                     targetFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
                 }
 
                 entry.name.startsWith("transformers/") -> {
                     val targetFile = resolveZipTarget(transformersDir, entry.name.splitSlash())
                     targetFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
                 }
 
@@ -435,7 +479,10 @@ object SettingsExporter {
 
                     val targetFile = resolveZipTarget(subdir, fileName)
                     targetFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
                 }
 
@@ -449,7 +496,10 @@ object SettingsExporter {
                     clipboardDir.mkdirs()
                     val targetFile = resolveZipTarget(clipboardDir, relDir)
                     targetFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
                 }
 
@@ -465,7 +515,10 @@ object SettingsExporter {
                     userProfileDir.mkdirs()
                     val targetFile = resolveZipTarget(userProfileDir, relDir)
                     targetFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
                 }
 
@@ -476,7 +529,10 @@ object SettingsExporter {
                     val targetFile = resolveZipTarget(rimeDir, relDir)
 
                     targetFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
                 }
 
@@ -485,7 +541,10 @@ object SettingsExporter {
 
                     val targetFile = resolveZipTarget(themesDir, entry.name.splitSlash())
                     targetFile.outputStream().use {
-                        zipIn.copyTo(it)
+                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                    }
+                    if (totalBytesExtracted > maxBackupTotalBytes) {
+                        throw IllegalArgumentException("Backup exceeds total size limit")
                     }
                 }
 
@@ -537,7 +596,7 @@ object SettingsExporter {
                 var entry = zipIn.nextEntry
                 while (entry != null) {
                     if (!entry.isDirectory && entry.name == versionFileName) {
-                        val bytes = zipIn.readAllBytesCompat()
+                        val bytes = zipIn.readAllBytesCompat(1024)
 
                         val buff = ByteBuffer.wrap(bytes).apply { order(ByteOrder.LITTLE_ENDIAN) }
                         val version = buff.get()

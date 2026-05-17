@@ -78,6 +78,7 @@ import org.futo.voiceinput.shared.types.ModelFileFile
 import org.futo.voiceinput.shared.types.ModelLoader
 import java.io.BufferedReader
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.ByteBuffer
@@ -640,11 +641,36 @@ sealed class ItemBeingImported {
 }
 
 class ImportResourceActivity : ComponentActivity() {
+    companion object {
+        private const val MAX_IMPORT_SIZE_BYTES = 256L * 1024L * 1024L
+    }
+
     private val themeOption: MutableState<ThemeOption?> = mutableStateOf(null)
     private val itemBeingImported: MutableState<ItemBeingImported?> = mutableStateOf(null)
     private var uri: Uri? = null
 
     private fun normalizeFilename(name: String) = name.replace("/", "_").replace(":", "_").replace(" ", "_")
+
+    private fun ensureImportSizeWithinLimit(uri: Uri, maxBytes: Long = MAX_IMPORT_SIZE_BYTES) {
+        val descriptorSize = contentResolver.openFileDescriptor(uri, "r")?.use { it.statSize } ?: -1L
+        if (descriptorSize > maxBytes) {
+            throw IOException("Import file too large")
+        }
+
+        if (descriptorSize < 0) {
+            contentResolver.openInputStream(uri)?.use { stream ->
+                val buffer = ByteArray(8192)
+                var total = 0L
+                var bytesRead: Int
+                while (stream.read(buffer).also { bytesRead = it } != -1) {
+                    total += bytesRead
+                    if (total > maxBytes) {
+                        throw IOException("Import file too large")
+                    }
+                }
+            } ?: throw IOException("Could not read import file")
+        }
+    }
 
     private fun applyUserDictSetting(data: DetectedUserDictFile, inputMethodSubtype: InputMethodSubtype) {
         val locale = inputMethodSubtype.locale
@@ -947,6 +973,12 @@ class ImportResourceActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         this.uri = intent?.data!!
+        try {
+            ensureImportSizeWithinLimit(this.uri!!)
+        } catch (e: Exception) {
+            finish()
+            return
+        }
 
         itemBeingImported.value = detectItemBeingImported()
 

@@ -6,6 +6,8 @@ import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 object ZipFileHelper {
+    private const val MAX_PARSED_ENTRY_BYTES = 1 * 1024 * 1024
+
     fun parse(inputStream: InputStream, vararg targets: Pair<String, (ByteArray) -> Unit>): Boolean {
         val targets = targets.associate { it.first to it.second }
         val found = targets.entries.associate { it.key to false }.toMutableMap()
@@ -16,7 +18,7 @@ object ZipFileHelper {
                     if (targets.containsKey(entry.name)) {
                         found[entry.name] = true
 
-                        val bytes = zipIn.readAllBytesCompat()
+                        val bytes = zipIn.readAllBytesCompat(MAX_PARSED_ENTRY_BYTES)
                         targets[entry.name]!!.invoke(bytes)
                     }
 
