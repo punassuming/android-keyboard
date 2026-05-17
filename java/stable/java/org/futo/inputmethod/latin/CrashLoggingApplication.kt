@@ -18,13 +18,11 @@ import androidx.core.content.edit
 import org.acra.builder.ReportBuilder
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.data.CrashReportDataFactory
-import org.futo.inputmethod.latin.settings.Settings
 import org.futo.inputmethod.latin.uix.isDirectBootUnlocked
 import org.futo.inputmethod.latin.uix.settings.LocalDataStoreCache
 import org.futo.inputmethod.latin.uix.settings.NavigationItem
 import org.futo.inputmethod.latin.uix.settings.NavigationItemStyle
 import org.futo.inputmethod.latin.uix.settings.pages.copyToClipboard
-import kotlin.collections.plus
 
 class CrashLoggingApplication : Application() /*, Configuration.Provider*/ {
     //override val workManagerConfiguration: Configuration
@@ -104,9 +102,8 @@ class CrashLoggingApplication : Application() /*, Configuration.Provider*/ {
 
         fun logPreferences(preferences: Preferences) {
             if(acraInitialized) {
-                preferences.asMap().forEach {
-                    ACRA.errorReporter.putCustomData(it.key.name, it.value.toString())
-                }
+                ACRA.errorReporter.putCustomData("preferences_redacted", "true")
+                ACRA.errorReporter.putCustomData("preferences_count", preferences.asMap().size.toString())
             }
         }
 
@@ -120,9 +117,11 @@ class CrashLoggingApplication : Application() /*, Configuration.Provider*/ {
                 navigate = {
                     val json = CrashReportDataFactory(context, CoreConfigurationBuilder().build())
                         .createCrashData(ReportBuilder().message("Copy logs").customData(
-                            data!!.currPreferences.asMap().map {
-                                it.key.name to it.value.toString()
-                            }.toMap() + mapOf("Settings" to Settings.getInstance().current.dump())
+                            mapOf(
+                                "preferences_redacted" to "true",
+                                "preferences_count" to data!!.currPreferences.asMap().size.toString(),
+                                "settings_redacted" to "true"
+                            )
                         ))
                         .toJSON()
 
