@@ -315,12 +315,14 @@ object SettingsExporter {
             throw IllegalArgumentException("Invalid path in backup: $relativePath")
         }
 
+        if (!baseDir.exists()) {
+            baseDir.mkdirs()
+        }
+
         val target = File(baseDir, normalized)
-        val baseCanonical = baseDir.canonicalFile
-        val targetCanonical = target.canonicalFile
-        val basePath = baseCanonical.path
-        val targetPath = targetCanonical.path
-        if (targetPath != basePath && !targetPath.startsWith("$basePath${File.separator}")) {
+        val basePath = baseDir.canonicalFile.toPath()
+        val targetPath = target.canonicalFile.toPath()
+        if (targetPath != basePath && !targetPath.startsWith(basePath)) {
             throw IllegalArgumentException("Path traversal attempt in backup: $relativePath")
         }
 
@@ -421,7 +423,11 @@ object SettingsExporter {
 
                     val subdirName = names[1]
                     val fileName = names[2]
-                    if (!subdirName.startsWith("UserHistoryDictionary")) {
+                    if (
+                        !subdirName.startsWith("UserHistoryDictionary")
+                        || subdirName.contains("..")
+                        || fileName.contains("..")
+                    ) {
                         throw IllegalArgumentException("Invalid user dictionary directory in backup: $subdirName")
                     }
 
