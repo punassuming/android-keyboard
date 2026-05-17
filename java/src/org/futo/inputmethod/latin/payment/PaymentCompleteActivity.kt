@@ -34,10 +34,11 @@ import org.futo.inputmethod.latin.uix.settings.pages.PaymentThankYouScreen
 import org.futo.inputmethod.latin.uix.settings.pages.startAppActivity
 import org.futo.inputmethod.latin.uix.theme.UixThemeAuto
 import org.futo.inputmethod.updates.openURI
+import java.util.concurrent.TimeUnit
 
 class PaymentCompleteActivity : ComponentActivity() {
     companion object {
-        private const val PAYMENT_PENDING_WINDOW_MS = 1000L * 60L * 60L * 24L
+        private val PAYMENT_PENDING_WINDOW_MS = TimeUnit.DAYS.toMillis(1)
         private const val KEYBOARD_ACTIVATION_URI = "futo-keyboard://license/activate"
         private const val VOICE_INPUT_ACTIVATION_URI = "futo-voice-input://license/activate"
     }

@@ -644,7 +644,7 @@ sealed class ItemBeingImported {
 class ImportResourceActivity : ComponentActivity() {
     companion object {
         private const val MAX_IMPORT_SIZE_BYTES = 256L * 1024L * 1024L
-        private const val MAX_IMPORT_SIZE_DISPLAY = "256MB"
+        private val MAX_IMPORT_SIZE_DISPLAY = "${MAX_IMPORT_SIZE_BYTES / (1024L * 1024L)}MB"
     }
 
     private val themeOption: MutableState<ThemeOption?> = mutableStateOf(null)
