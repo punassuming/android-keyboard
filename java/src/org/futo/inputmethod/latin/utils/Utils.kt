@@ -17,7 +17,7 @@ fun InputStream.readAllBytesCompat(maxBytes: Int): ByteArray {
     while (this.read(data, 0, data.size).also { nRead = it } != -1) {
         total += nRead
         if (total > maxBytes) {
-            throw IOException("Input exceeds maximum allowed size")
+            throw IOException("Input exceeds maximum allowed size of $maxBytes bytes")
         }
         buffer.write(data, 0, nRead)
     }

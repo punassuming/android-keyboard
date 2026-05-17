@@ -196,7 +196,7 @@ object SettingsExporter {
         while (input.read(buffer).also { read = it } != -1) {
             total += read
             if (total > maxBytes) {
-                throw IllegalArgumentException("Backup entry exceeds size limit")
+                throw IllegalArgumentException("Backup entry exceeds size limit of $maxBytes bytes")
             }
             output.write(buffer, 0, read)
         }
@@ -396,7 +396,7 @@ object SettingsExporter {
                     val prefsData = zipIn.readAllBytesCompat(maxBackupEntryBytes)
                     totalBytesExtracted += prefsData.size.toLong()
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                     val prefs = PreferencesSerializer.readFrom(prefsData.inputStream().source().buffer())
                     context.dataStore.updateData { prefs }
@@ -406,7 +406,7 @@ object SettingsExporter {
                     val data = zipIn.readAllBytesCompat(maxBackupEntryBytes)
                     totalBytesExtracted += data.size.toLong()
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                     val editor = getDefaultSharedPreferences(context).edit()
                     readSharedPrefs(editor, data.inputStream())
@@ -418,7 +418,7 @@ object SettingsExporter {
                     val data = zipIn.readAllBytesCompat(maxBackupEntryBytes)
                     totalBytesExtracted += data.size.toLong()
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                     readPersonalDict(context, data.inputStream(), destructive)
                 }
@@ -428,7 +428,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
 
                     onClipboardImportedFlow.emit(clipboardFile)
@@ -440,7 +440,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                 }
 
@@ -450,7 +450,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                 }
 
@@ -478,7 +478,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                 }
 
@@ -495,7 +495,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                 }
 
@@ -514,7 +514,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                 }
 
@@ -528,7 +528,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                 }
 
@@ -540,7 +540,7 @@ object SettingsExporter {
                         totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
-                        throw IllegalArgumentException("Backup exceeds total size limit")
+                        throw IllegalArgumentException("Backup exceeds total size limit of $maxBackupTotalBytes bytes")
                     }
                 }
 
