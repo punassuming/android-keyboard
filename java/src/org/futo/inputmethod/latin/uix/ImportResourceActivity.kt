@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.InputMethodSubtype
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -643,6 +644,7 @@ sealed class ItemBeingImported {
 class ImportResourceActivity : ComponentActivity() {
     companion object {
         private const val MAX_IMPORT_SIZE_BYTES = 256L * 1024L * 1024L
+        private const val MAX_IMPORT_SIZE_DISPLAY = "256MB"
     }
 
     private val themeOption: MutableState<ThemeOption?> = mutableStateOf(null)
@@ -654,7 +656,7 @@ class ImportResourceActivity : ComponentActivity() {
     private fun ensureImportSizeWithinLimit(uri: Uri, maxBytes: Long = MAX_IMPORT_SIZE_BYTES) {
         val descriptorSize = contentResolver.openFileDescriptor(uri, "r")?.use { it.statSize } ?: -1L
         if (descriptorSize > maxBytes) {
-            throw IOException("Import file too large")
+            throw IOException("Import file exceeds maximum size of $MAX_IMPORT_SIZE_DISPLAY")
         }
 
         if (descriptorSize < 0) {
@@ -665,7 +667,7 @@ class ImportResourceActivity : ComponentActivity() {
                 while (stream.read(buffer).also { bytesRead = it } != -1) {
                     total += bytesRead
                     if (total > maxBytes) {
-                        throw IOException("Import file too large")
+                        throw IOException("Import file exceeds maximum size of $MAX_IMPORT_SIZE_DISPLAY")
                     }
                 }
             } ?: throw IOException("Could not read import file")
@@ -976,6 +978,8 @@ class ImportResourceActivity : ComponentActivity() {
         try {
             ensureImportSizeWithinLimit(this.uri!!)
         } catch (e: Exception) {
+            Log.w("ImportResourceActivity", "Rejecting import", e)
+            Toast.makeText(this, e.message ?: "Failed to import file", Toast.LENGTH_LONG).show()
             finish()
             return
         }

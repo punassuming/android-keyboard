@@ -189,11 +189,7 @@ object SettingsExporter {
     private const val maxBackupEntryBytes = 128 * 1024 * 1024
     private const val maxBackupTotalBytes = 512L * 1024L * 1024L
 
-    private fun readEntryBytesLimited(input: InputStream, maxBytes: Int): ByteArray {
-        return input.readAllBytesCompat(maxBytes)
-    }
-
-    private fun copyEntryToLimited(input: InputStream, output: OutputStream, maxBytes: Int): Long {
+    private fun copyInputStreamWithLimit(input: InputStream, output: OutputStream, maxBytes: Int): Long {
         val buffer = ByteArray(8192)
         var total = 0L
         var read: Int
@@ -397,7 +393,7 @@ object SettingsExporter {
                 entry.name == versionFileName -> {}
 
                 entry.name == datastoreFileName -> {
-                    val prefsData = readEntryBytesLimited(zipIn, maxBackupEntryBytes)
+                    val prefsData = zipIn.readAllBytesCompat(maxBackupEntryBytes)
                     totalBytesExtracted += prefsData.size.toLong()
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -407,7 +403,7 @@ object SettingsExporter {
                 }
 
                 entry.name == sharedPreferencesFileName -> {
-                    val data = readEntryBytesLimited(zipIn, maxBackupEntryBytes)
+                    val data = zipIn.readAllBytesCompat(maxBackupEntryBytes)
                     totalBytesExtracted += data.size.toLong()
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -419,7 +415,7 @@ object SettingsExporter {
                 }
 
                 entry.name == personalDictFileName -> {
-                    val data = readEntryBytesLimited(zipIn, maxBackupEntryBytes)
+                    val data = zipIn.readAllBytesCompat(maxBackupEntryBytes)
                     totalBytesExtracted += data.size.toLong()
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -429,7 +425,7 @@ object SettingsExporter {
 
                 entry.name == clipboardFileName -> {
                     clipboardFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -441,7 +437,7 @@ object SettingsExporter {
                 entry.name.startsWith("ext/") -> {
                     val targetFile = resolveZipTarget(extFilesDir, entry.name.splitSlash())
                     targetFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -451,7 +447,7 @@ object SettingsExporter {
                 entry.name.startsWith("transformers/") -> {
                     val targetFile = resolveZipTarget(transformersDir, entry.name.splitSlash())
                     targetFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -479,7 +475,7 @@ object SettingsExporter {
 
                     val targetFile = resolveZipTarget(subdir, fileName)
                     targetFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -496,7 +492,7 @@ object SettingsExporter {
                     clipboardDir.mkdirs()
                     val targetFile = resolveZipTarget(clipboardDir, relDir)
                     targetFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -515,7 +511,7 @@ object SettingsExporter {
                     userProfileDir.mkdirs()
                     val targetFile = resolveZipTarget(userProfileDir, relDir)
                     targetFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -529,7 +525,7 @@ object SettingsExporter {
                     val targetFile = resolveZipTarget(rimeDir, relDir)
 
                     targetFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")
@@ -541,7 +537,7 @@ object SettingsExporter {
 
                     val targetFile = resolveZipTarget(themesDir, entry.name.splitSlash())
                     targetFile.outputStream().use {
-                        totalBytesExtracted += copyEntryToLimited(zipIn, it, maxBackupEntryBytes)
+                        totalBytesExtracted += copyInputStreamWithLimit(zipIn, it, maxBackupEntryBytes)
                     }
                     if (totalBytesExtracted > maxBackupTotalBytes) {
                         throw IllegalArgumentException("Backup exceeds total size limit")

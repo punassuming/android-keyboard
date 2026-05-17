@@ -851,7 +851,7 @@ class ClipboardHistoryManager(val context: Context, val coroutineScope: Lifecycl
         decodeData(AtomicFile(file).readFully())
 
     private fun reportError(during: String, e: Exception) {
-        val summarize = { file: File ->
+        val summarizeFileInfo = { file: File ->
             if(!file.exists()) {
                 "${file.name}: missing"
             } else {
@@ -867,9 +867,9 @@ Cause: ${e.message}
 Stack trace: ${e.stackTrace.map { it.toString() }}
 
 Clipboard files (content redacted):
-${summarize(clipboardFile)}
-${summarize(clipboardFileBak)}
-${summarize(clipboardFileSwap)}
+${summarizeFileInfo(clipboardFile)}
+${summarizeFileInfo(clipboardFileBak)}
+${summarizeFileInfo(clipboardFileSwap)}
 """))
     }
 

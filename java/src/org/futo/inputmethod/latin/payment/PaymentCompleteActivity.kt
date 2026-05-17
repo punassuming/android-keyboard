@@ -36,9 +36,15 @@ import org.futo.inputmethod.latin.uix.theme.UixThemeAuto
 import org.futo.inputmethod.updates.openURI
 
 class PaymentCompleteActivity : ComponentActivity() {
+    companion object {
+        private const val PAYMENT_PENDING_WINDOW_MS = 1000L * 60L * 60L * 24L
+        private const val KEYBOARD_ACTIVATION_URI = "futo-keyboard://license/activate"
+        private const val VOICE_INPUT_ACTIVATION_URI = "futo-voice-input://license/activate"
+    }
+
     private fun isExpectedActivationUri(targetData: String): Boolean {
-        return targetData == "futo-keyboard://license/activate"
-                || targetData == "futo-voice-input://license/activate"
+        return targetData == KEYBOARD_ACTIVATION_URI
+                || targetData == VOICE_INPUT_ACTIVATION_URI
     }
 
     private fun updateContent() {
@@ -114,7 +120,7 @@ class PaymentCompleteActivity : ComponentActivity() {
 
         val targetData = intent.dataString
         val pendingStartedAt = applicationContext.getSetting(PAYMENT_PENDING_STARTED_AT)
-        val isRecentPending = (System.currentTimeMillis() - pendingStartedAt) <= (1000L * 60L * 60L * 24L)
+        val isRecentPending = (System.currentTimeMillis() - pendingStartedAt) <= PAYMENT_PENDING_WINDOW_MS
         val isPending = applicationContext.getSetting(IS_PAYMENT_PENDING)
 
         if(targetData != null && isExpectedActivationUri(targetData) && isPending && isRecentPending) {
