@@ -22,6 +22,7 @@ If you want to contribute layouts, check out the [layouts repo](https://github.c
 
 ## Documentation
 
+- [Custom Keyboard Layouts](docs/custom-layouts.md) — how to create your own keyboard layout (or add keys to an existing one) using the in-app editor or the YAML layout format.
 - [Transformer Language Models](docs/transformer-models.md) — how to create, configure, and build custom GGUF language models for the keyboard.
 - [Dictionaries](docs/dictionaries.md) — how to create wordlists in the `.combined` format, compile them to binary `.dict` files, and bundle them in the app.
 
