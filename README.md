@@ -20,6 +20,11 @@ If you want to help translate the app, please do so via our Pontoon instance: ht
 
 If you want to contribute layouts, check out the [layouts repo](https://github.com/futo-org/futo-keyboard-layouts).
 
+## Documentation
+
+- [Transformer Language Models](docs/transformer-models.md) — how to create, configure, and build custom GGUF language models for the keyboard.
+- [Dictionaries](docs/dictionaries.md) — how to create wordlists in the `.combined` format, compile them to binary `.dict` files, and bundle them in the app.
+
 ## Building
 
 When cloning the repository, you must perform a recursive clone to fetch all dependencies:
