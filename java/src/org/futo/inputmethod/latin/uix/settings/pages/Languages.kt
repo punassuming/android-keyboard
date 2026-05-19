@@ -511,6 +511,12 @@ val LanguageSettingsTop = listOf(
 )
 val LanguageSettingsBottom = listOf(
     userSettingNavigationItem(
+        title = R.string.language_settings_custom_layouts,
+        subtitle = R.string.language_settings_custom_layouts_subtitle,
+        style = NavigationItemStyle.Misc,
+        navigateTo = "devlayouteditor",
+    ),
+    userSettingNavigationItem(
         title = R.string.language_settings_import_resource_from_file,
         style = NavigationItemStyle.Misc,
         navigate = { nav ->
