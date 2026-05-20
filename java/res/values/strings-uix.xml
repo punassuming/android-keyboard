@@ -17,6 +17,11 @@
     <string name="action_cursor_down_title">Arrow Down</string>
     <string name="action_cursor_left_title">Arrow Left</string>
     <string name="action_cursor_right_title">Arrow Right</string>
+    <!-- Special key actions -->
+    <string name="action_escape_title">Escape</string>
+    <string name="action_tab_title">Tab</string>
+    <string name="action_ctrl_title">Ctrl</string>
+    <string name="action_alt_title">Alt</string>
 
     <!-- For emoji menu action -->
     <string name="action_emoji_title">Emojis</string>

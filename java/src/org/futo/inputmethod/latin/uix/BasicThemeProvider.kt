@@ -44,6 +44,8 @@ val KeyBordersSetting = SettingsKey(booleanPreferencesKey("keyBorders"), true)
 val HiddenKeysSetting = SettingsKey(booleanPreferencesKey("hiddenKeys1"), false)
 val KeyHintsSetting   = SettingsKey(booleanPreferencesKey("keyHints"), false)
 
+private const val DEFAULT_WALL_COLOR_ALPHA = 0.7f
+
 fun<T> Preferences.get(key: SettingsKey<T>): T {
     return this[key.key] ?: key.default
 }
@@ -535,6 +537,18 @@ class BasicThemeProvider(val context: Context, val colorScheme: KeyboardColorSch
                     onKeyColor,
                     background, onBackground,
                     spaceCornerRadius
+                )
+            },
+
+            KeyVisualStyle.Wall to run {
+                // Use theme-configured wall color if available, otherwise derive from keyboard surface.
+                val wallColor = advanced.wallColor
+                    ?: colorScheme.keyboardSurfaceDim.copy(alpha = DEFAULT_WALL_COLOR_ALPHA).toArgb()
+                VisualStyleDescriptor(
+                    backgroundDrawable = coloredRoundedRectangle(wallColor, dp(keyCornerRadius)),
+                    foregroundColor    = wallColor,
+                    backgroundDrawablePressed = coloredRoundedRectangle(wallColor, dp(keyCornerRadius)),
+                    foregroundColorPressed    = wallColor
                 )
             }
         )

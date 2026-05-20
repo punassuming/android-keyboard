@@ -590,6 +590,12 @@ enum class KeyVisualStyle {
      * Visual style for moreKeys
      */
     MoreKey,
+
+    /**
+     * Visual style for wall keys (thin visual dividers between key groups).
+     * Renders as a thin colored bar with no interactive behavior.
+     */
+    Wall,
 }
 
 /**
@@ -624,6 +630,44 @@ class GapKey(val attributes: KeyAttributes = KeyAttributes()) : AbstractKey {
             repeatable = false,
             moreKeyFlags = 0,
             countsToKeyCoordinate = moreKeyMode.autoNumFromCoord && moreKeyMode.autoSymFromCoord,
+            hint = "",
+            labelFlags = 0
+        )
+    }
+}
+
+/**
+ * A thin visual divider between groups of keys. Has no interactive behavior.
+ * Use it in keyboard layouts to visually separate key groups (e.g. between a numpad and letters).
+ * The color of the wall is controlled by the [KeyVisualStyle.Wall] theme setting.
+ */
+@Serializable
+@SerialName("wall")
+class WallKey(val attributes: KeyAttributes = KeyAttributes()) : AbstractKey {
+    override fun countsToKeyCoordinate(params: KeyboardParams, row: Row, keyboard: Keyboard): Boolean = false
+
+    override fun computeData(
+        params: KeyboardParams,
+        row: Row,
+        keyboard: Keyboard,
+        coordinate: KeyCoordinate
+    ): ComputedKeyData {
+        val attributes = attributes.getEffectiveAttributes(row, keyboard)
+
+        return ComputedKeyData(
+            label = "",
+            code = Constants.CODE_WALL,
+            outputText = null,
+            width = attributes.width ?: KeyWidth.FunctionalKey,
+            icon = "",
+            style = KeyVisualStyle.Wall,
+            anchored = attributes.anchored!!,
+            showPopup = false,
+            moreKeys = listOf(),
+            longPressEnabled = false,
+            repeatable = false,
+            moreKeyFlags = 0,
+            countsToKeyCoordinate = false,
             hint = "",
             labelFlags = 0
         )

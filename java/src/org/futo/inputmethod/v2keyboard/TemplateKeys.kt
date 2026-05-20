@@ -57,6 +57,31 @@ val TemplateDeleteKey = BaseKey(
     attributes = FunctionalAttributes.copy(repeatableEnabled = true)
 )
 
+val TemplateTabKey = BaseKey(
+    spec = "!icon/tab_key|!code/key_tab",
+    attributes = FunctionalAttributes
+)
+
+val TemplateShiftTabKey = BaseKey(
+    spec = "⇤|!code/key_shift_tab",
+    attributes = FunctionalAttributes
+)
+
+val TemplateEscapeKey = BaseKey(
+    spec = "Esc|!code/key_escape",
+    attributes = FunctionalAttributes
+)
+
+val TemplateCtrlKey = BaseKey(
+    spec = "Ctrl|!code/key_ctrl",
+    attributes = FunctionalAttributes
+)
+
+val TemplateAltKey = BaseKey(
+    spec = "Alt|!code/key_alt",
+    attributes = FunctionalAttributes
+)
+
 val TemplateSymbolsKey = BaseKey(
     spec = "!text/keylabel_to_symbol|!code/key_switch_alpha_symbol",
     attributes = FunctionalAttributes
@@ -290,6 +315,16 @@ val TemplateEnterKey = EnterKey()
 val TemplateActionKey = ActionKey()
 val TemplateContextualKey = ContextualKey()
 val TemplateGapKey = GapKey()
+val TemplateWallKey = WallKey(
+    attributes = KeyAttributes(
+        width = KeyWidth.FunctionalKey,
+        style = KeyVisualStyle.Wall,
+        showPopup = false,
+        moreKeyMode = MoreKeyMode.OnlyExplicit,
+        longPressEnabled = false,
+        repeatableEnabled = false
+    )
+)
 val TemplateZWNJKey = BaseKey(
     spec = "!icon/zwnj_key|\u200C",
     moreKeys = listOf("!icon/zwj_key|\u200D"),
@@ -368,6 +403,12 @@ val TemplateKeys = mapOf(
     "zwnj" to TemplateZWNJKey,
     "optionalzwnj" to TemplateOptionalZWNJKey,
     "gap" to TemplateGapKey,
+    "wall" to TemplateWallKey,
+    "tab" to TemplateTabKey,
+    "shift_tab" to TemplateShiftTabKey,
+    "escape" to TemplateEscapeKey,
+    "ctrl" to TemplateCtrlKey,
+    "alt" to TemplateAltKey,
     "alt0" to TemplateAlt0Key,
     "alt1" to TemplateAlt1Key,
     "alt2" to TemplateAlt2Key,
