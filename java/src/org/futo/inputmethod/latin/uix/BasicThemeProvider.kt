@@ -536,6 +536,18 @@ class BasicThemeProvider(val context: Context, val colorScheme: KeyboardColorSch
                     background, onBackground,
                     spaceCornerRadius
                 )
+            },
+
+            KeyVisualStyle.Wall to run {
+                // Use theme-configured wall color if available, otherwise derive from keyboard surface.
+                val wallColor = advanced.wallColor
+                    ?: colorScheme.keyboardSurfaceDim.copy(alpha = 0.7f).toArgb()
+                VisualStyleDescriptor(
+                    backgroundDrawable = coloredRoundedRectangle(wallColor, dp(keyCornerRadius)),
+                    foregroundColor    = wallColor,
+                    backgroundDrawablePressed = coloredRoundedRectangle(wallColor, dp(keyCornerRadius)),
+                    foregroundColorPressed    = wallColor
+                )
             }
         )
 

@@ -28,4 +28,9 @@ data class AdvancedThemeOptions(
     val font: Typeface? = null,
     val themeName: String? = null,
     val themeAuthor: String? = null,
+    /**
+     * Optional custom color for wall keys ([org.futo.inputmethod.v2keyboard.WallKey]).
+     * When null, a default color derived from the keyboard surface color is used.
+     */
+    val wallColor: Int? = null,
 )

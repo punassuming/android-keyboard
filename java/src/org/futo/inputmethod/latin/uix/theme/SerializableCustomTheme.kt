@@ -144,7 +144,13 @@ data class SerializableCustomTheme(
     val url: String? = null,
 
     val keyBackgrounds: Map<String, String> = mapOf(),
-    val keyIcons: Map<String, String> = mapOf()
+    val keyIcons: Map<String, String> = mapOf(),
+
+    /**
+     * Optional custom color for wall keys. Hex string (e.g. "#FF334455").
+     * When absent, a default derived from the theme colors is used.
+     */
+    val wallColor: SerializableColor? = null,
 ) {
     fun toKeyboardScheme(ctx: ThemeDecodingContext): KeyboardColorScheme {
         return KeyboardColorScheme(
@@ -235,7 +241,8 @@ data class SerializableCustomTheme(
                     font = decodeOptionalFont(ctx, keysFont),
 
                     themeName = name,
-                    themeAuthor = author
+                    themeAuthor = author,
+                    wallColor = wallColor?.toColor()?.toArgb(),
                 ),
             )
         )
