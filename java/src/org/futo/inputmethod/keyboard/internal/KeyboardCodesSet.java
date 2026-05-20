@@ -73,6 +73,8 @@ public final class KeyboardCodesSet {
         "key_unspecified",
         "key_escape",
         "key_ctrl",
+        "key_alt",
+        "key_shift_tab",
     };
 
     private static final int[] DEFAULT = {
@@ -103,6 +105,8 @@ public final class KeyboardCodesSet {
         Constants.CODE_UNSPECIFIED,
         Constants.CODE_ESCAPE,
         Constants.CODE_CTRL,
+        Constants.CODE_ALT,
+        Constants.CODE_SHIFT_TAB,
     };
 
     static {

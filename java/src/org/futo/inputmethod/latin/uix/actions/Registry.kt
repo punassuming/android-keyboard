@@ -46,6 +46,7 @@ val AllActionsMap = mapOf(
     "escape" to EscapeAction,
     "tab" to TabAction,
     "ctrl" to CtrlAction,
+    "alt" to AltAction,
 )
 
 val ActionToId = AllActionsMap.entries.associate { it.value to it.key }

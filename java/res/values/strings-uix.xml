@@ -21,6 +21,7 @@
     <string name="action_escape_title">Escape</string>
     <string name="action_tab_title">Tab</string>
     <string name="action_ctrl_title">Ctrl</string>
+    <string name="action_alt_title">Alt</string>
 
     <!-- For emoji menu action -->
     <string name="action_emoji_title">Emojis</string>

@@ -62,6 +62,11 @@ val TemplateTabKey = BaseKey(
     attributes = FunctionalAttributes
 )
 
+val TemplateShiftTabKey = BaseKey(
+    spec = "⇤|!code/key_shift_tab",
+    attributes = FunctionalAttributes
+)
+
 val TemplateEscapeKey = BaseKey(
     spec = "Esc|!code/key_escape",
     attributes = FunctionalAttributes
@@ -69,6 +74,11 @@ val TemplateEscapeKey = BaseKey(
 
 val TemplateCtrlKey = BaseKey(
     spec = "Ctrl|!code/key_ctrl",
+    attributes = FunctionalAttributes
+)
+
+val TemplateAltKey = BaseKey(
+    spec = "Alt|!code/key_alt",
     attributes = FunctionalAttributes
 )
 
@@ -395,8 +405,10 @@ val TemplateKeys = mapOf(
     "gap" to TemplateGapKey,
     "wall" to TemplateWallKey,
     "tab" to TemplateTabKey,
+    "shift_tab" to TemplateShiftTabKey,
     "escape" to TemplateEscapeKey,
     "ctrl" to TemplateCtrlKey,
+    "alt" to TemplateAltKey,
     "alt0" to TemplateAlt0Key,
     "alt1" to TemplateAlt1Key,
     "alt2" to TemplateAlt2Key,

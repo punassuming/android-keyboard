@@ -898,6 +898,12 @@ public final class InputLogic {
             case Constants.CODE_WALL:
                 // Wall key is a visual-only element; no action on press.
                 break;
+            case Constants.CODE_ALT:
+                sendDownUpKeyEvent(KeyEvent.KEYCODE_ALT_LEFT, 0);
+                break;
+            case Constants.CODE_SHIFT_TAB:
+                sendDownUpKeyEvent(KeyEvent.KEYCODE_TAB, KeyEvent.META_SHIFT_ON);
+                break;
             default:
                 BugViewerKt.throwIfDebug(new RuntimeException("Unknown key code : " + event.mKeyCode));
                 return;

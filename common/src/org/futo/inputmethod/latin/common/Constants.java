@@ -258,10 +258,14 @@ public final class Constants {
     public static final int CODE_UNSPECIFIED = -24;
     // Code for the Escape key: sends KEYCODE_ESCAPE to the current app.
     public static final int CODE_ESCAPE = -25;
-    // Code for the Ctrl key: sends a Ctrl key event to the current app.
+    // Code for the Ctrl key: sends KEYCODE_CTRL_LEFT to the current app.
     public static final int CODE_CTRL = -26;
     // Code for the wall key: a visual divider with no functional behavior.
     public static final int CODE_WALL = -27;
+    // Code for the Alt key: sends KEYCODE_ALT_LEFT to the current app.
+    public static final int CODE_ALT = -28;
+    // Code for Shift+Tab (backtab): sends KEYCODE_TAB with META_SHIFT_ON.
+    public static final int CODE_SHIFT_TAB = -29;
 
     public static final int CODE_ACTION_0 = -1050;
     public static final int CODE_ACTION_MAX = CODE_ACTION_0 + 100;
@@ -293,6 +297,11 @@ public final class Constants {
         case CODE_TAB: return "tab";
         case CODE_ENTER: return "enter";
         case CODE_SPACE: return "space";
+        case CODE_ESCAPE: return "escape";
+        case CODE_CTRL: return "ctrl";
+        case CODE_WALL: return "wall";
+        case CODE_ALT: return "alt";
+        case CODE_SHIFT_TAB: return "shiftTab";
         default:
             if (code < CODE_SPACE) return String.format("\\u%02X", code);
             if (code < 0x100) return String.format("%c", code);
